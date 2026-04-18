@@ -7,9 +7,10 @@ interface FeedProps {
   clips: RankedClip[];
   generationState: GenerationState;
   onFeedback: (clipId: string, feedback: 'use' | 'skip') => void;
+  onClipChange?: (index: number) => void;
 }
 
-export function Feed({ clips, generationState, onFeedback }: FeedProps) {
+export function Feed({ clips, generationState, onFeedback, onClipChange }: FeedProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isScoreAnimating, setIsScoreAnimating] = useState(false);
@@ -50,6 +51,11 @@ export function Feed({ clips, generationState, onFeedback }: FeedProps) {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [goNext, goPrev, handleFeedback, currentClip]);
+
+  // Notify parent of clip change
+  useEffect(() => {
+    onClipChange?.(currentIndex);
+  }, [currentIndex, onClipChange]);
 
   // Auto-advance timer (6s)
   useEffect(() => {

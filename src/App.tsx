@@ -21,12 +21,15 @@ function App() {
   const [activeClipIndex, setActiveClipIndex] = useState(0);
   const activeClip = rankedClips[activeClipIndex] || rankedClips[0] || null;
 
+  const handleClipChange = useCallback((index: number) => {
+    setActiveClipIndex(index);
+  }, []);
+
   const handleFeedback = useCallback((clipId: string, feedback: 'use' | 'skip') => {
     const clip = DEMO_CLIPS.find(c => c.id === clipId);
     if (!clip) return;
     setAlgoState(prev => updateAlgoState(prev, clip, feedback));
-    setActiveClipIndex(i => Math.min(i + 1, rankedClips.length - 1));
-  }, [rankedClips.length]);
+  }, []);
 
   const handleGenerate = useCallback(() => {
     if (generationState.status === 'generating') return;
@@ -72,6 +75,7 @@ function App() {
           clips={rankedClips}
           generationState={generationState}
           onFeedback={handleFeedback}
+          onClipChange={handleClipChange}
         />
         <TrainingDashboard algoState={algoState} />
       </main>
