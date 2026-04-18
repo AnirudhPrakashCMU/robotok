@@ -1,11 +1,13 @@
 import type { Clip } from '../lib/types';
 
-// Pre-generated clip data for demo. Videos will be replaced with real Seedance clips.
-// Using placeholder video URLs that will point to S3/CloudFront in production.
+const CLIP_BASE = 'http://34.235.111.61:3002/clips';
+
+// Pre-generated clips from Seedance 1.5 Pro via BytePlus API.
+// 11 real AI-generated training scenario videos, 5s each, 720p, 16:9.
 export const DEMO_CLIPS: Clip[] = [
   {
     id: 'clip-001',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-000.mp4`,
     scenario: 'Night Rain Intersection',
     description: 'Autonomous vehicle navigating a rain-slicked urban intersection at night with pedestrian crossings',
     category: 'night_driving',
@@ -20,7 +22,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-002',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-001.mp4`,
     scenario: 'Highway Merge — Heavy Traffic',
     description: 'Merging onto a busy highway with dense truck traffic and narrow gap',
     category: 'highway_merge',
@@ -35,7 +37,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-003',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-002.mp4`,
     scenario: 'Cyclist in Bike Lane — Sudden Turn',
     description: 'Cyclist making an unexpected left turn from the bike lane into traffic',
     category: 'cyclists',
@@ -50,7 +52,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-004',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-003.mp4`,
     scenario: 'Construction Zone — Lane Shift',
     description: 'Navigating through an active construction zone with temporary lane markings',
     category: 'construction',
@@ -66,7 +68,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-005',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-004.mp4`,
     scenario: 'Pedestrian Group — Crosswalk Rush',
     description: 'Large group of pedestrians flooding a crosswalk at a school zone',
     category: 'pedestrians',
@@ -82,7 +84,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-006',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-005.mp4`,
     scenario: 'Heavy Rain — Limited Visibility',
     description: 'Driving through torrential rain with severely reduced visibility on a suburban road',
     category: 'rain_weather',
@@ -96,7 +98,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-007',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-006.mp4`,
     scenario: 'Night Highway — Deer Crossing',
     description: 'Detecting a deer at the highway shoulder at night, potential crossing hazard',
     category: 'night_driving',
@@ -109,7 +111,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-008',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-007.mp4`,
     scenario: 'Cyclist Convoy — Narrow Road',
     description: 'Encountering a group of 5 cyclists on a narrow road with oncoming traffic',
     category: 'cyclists',
@@ -125,7 +127,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-009',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-008.mp4`,
     scenario: 'Rain + Night — Reflections',
     description: 'Navigating a city street at night in rain with confusing reflections from neon signs',
     category: 'rain_weather',
@@ -140,7 +142,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-010',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-009.mp4`,
     scenario: 'Highway Merge — Motorcycle',
     description: 'Motorcycle cutting in during highway merge with aggressive lane change',
     category: 'highway_merge',
@@ -155,7 +157,7 @@ export const DEMO_CLIPS: Clip[] = [
   },
   {
     id: 'clip-011',
-    videoUrl: '',
+    videoUrl: `${CLIP_BASE}/clip-010.mp4`,
     scenario: 'Construction — Night Work',
     description: 'Passing through a nighttime construction zone with flashing lights and workers',
     category: 'construction',
