@@ -1,6 +1,6 @@
 import type { Clip } from '../lib/types';
 
-const CLIP_BASE = 'http://34.235.111.61:3002/clips';
+const CLIP_BASE = '/clips';
 
 // Pre-generated clips from Seedance 1.5 Pro via BytePlus API.
 // 11 real AI-generated training scenario videos, 5s each, 720p, 16:9.

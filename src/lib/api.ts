@@ -1,4 +1,4 @@
-const API_BASE = 'http://34.235.111.61:3002';
+const API_BASE = '';
 
 export async function checkHealth(): Promise<boolean> {
   try {
