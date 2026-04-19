@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import type { RankedClip, Detection } from '../lib/types';
+import type { SceneAnalysis } from '../lib/api';
 
 interface ScenePipelineProps {
   clip: RankedClip | null;
+  frameDataUrl?: string | null;
+  analysis?: SceneAnalysis | null;
+  isAnalyzing?: boolean;
 }
 
 function DetectionCanvas({ detections, width, height }: { detections: Detection[]; width: number; height: number }) {
@@ -25,21 +29,17 @@ function DetectionCanvas({ detections, width, height }: { detections: Detection[
       const pw = w * width;
       const ph = h * height;
 
-      // Stagger animation
       setTimeout(() => {
-        // Box
         ctx.strokeStyle = det.color;
         ctx.lineWidth = 2;
         ctx.strokeRect(px, py, pw, ph);
 
-        // Label background
         const label = `${det.label} ${(det.confidence * 100).toFixed(0)}%`;
         ctx.font = '10px "JetBrains Mono", monospace';
         const metrics = ctx.measureText(label);
         ctx.fillStyle = det.color;
         ctx.fillRect(px, py - 14, metrics.width + 6, 14);
 
-        // Label text
         ctx.fillStyle = '#0A0E17';
         ctx.fillText(label, px + 3, py - 3);
       }, i * 100);
@@ -66,7 +66,13 @@ function TypewriterScene({ text }: { text: string }) {
   return <span>{displayed}</span>;
 }
 
-export function ScenePipeline({ clip }: ScenePipelineProps) {
+const RISK_COLORS: Record<string, string> = {
+  high: '#EF4444',
+  medium: '#F59E0B',
+  low: '#22C55E',
+};
+
+export function ScenePipeline({ clip, frameDataUrl, analysis, isAnalyzing }: ScenePipelineProps) {
   if (!clip) {
     return (
       <aside className="w-[280px] flex-shrink-0 border-r p-4 flex items-center justify-center" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
@@ -75,6 +81,10 @@ export function ScenePipeline({ clip }: ScenePipelineProps) {
     );
   }
 
+  const sceneText = analysis?.scene_understanding || clip.sceneDescription;
+  const seedancePrompt = analysis?.seedance_prompt || clip.description;
+  const behaviors = analysis?.object_behaviors || [];
+
   return (
     <aside className="w-[280px] flex-shrink-0 border-r overflow-y-auto" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
       {/* Section label */}
@@ -82,21 +92,38 @@ export function ScenePipeline({ clip }: ScenePipelineProps) {
         <h2 className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>
           Scene Understanding
         </h2>
+        {isAnalyzing && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+            <span className="text-[10px]" style={{ color: 'var(--accent)' }}>Analyzing with Claude...</span>
+          </div>
+        )}
       </div>
 
-      {/* Rosbag frame with YOLO overlay */}
+      {/* Video frame with YOLO overlay */}
       <div className="px-4 pt-3">
         <div className="relative rounded overflow-hidden" style={{ background: '#000', aspectRatio: '16/10' }}>
-          {/* Placeholder frame */}
-          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111827, #1A2332)' }}>
-            <span className="text-3xl opacity-20">📷</span>
-          </div>
+          {frameDataUrl ? (
+            <img
+              src={`data:image/jpeg;base64,${frameDataUrl}`}
+              className="absolute inset-0 w-full h-full object-cover"
+              alt="Captured frame"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111827, #1A2332)' }}>
+              <div className="text-center">
+                <span className="text-2xl opacity-30">🎥</span>
+                <p className="text-[9px] mt-1 opacity-40" style={{ color: 'var(--text-dim)' }}>
+                  {clip.videoUrl ? 'Capturing frame...' : 'No video source'}
+                </p>
+              </div>
+            </div>
+          )}
           <DetectionCanvas
             detections={clip.detections}
             width={252}
             height={158}
           />
-          {/* Frame label */}
           <div className="absolute bottom-1 left-1 text-[9px] font-mono px-1 rounded" style={{ background: 'rgba(0,0,0,0.7)', color: 'var(--text-dim)' }}>
             rosbag_frame_{clip.id.split('-')[1]}
           </div>
@@ -121,6 +148,34 @@ export function ScenePipeline({ clip }: ScenePipelineProps) {
         </div>
       </div>
 
+      {/* Object behaviors from Claude */}
+      {behaviors.length > 0 && (
+        <>
+          <div className="mx-4 my-3 h-px" style={{ background: 'var(--border)' }} />
+          <div className="px-4">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+              Behavior Analysis
+            </h3>
+            <div className="flex flex-col gap-2">
+              {behaviors.map((b, i) => (
+                <div key={i} className="text-xs rounded p-2" style={{ background: 'var(--bg)' }}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{b.label}</span>
+                    <span className="text-[9px] px-1 rounded" style={{
+                      background: `${RISK_COLORS[b.risk] || '#64748B'}20`,
+                      color: RISK_COLORS[b.risk] || '#64748B'
+                    }}>
+                      {b.risk}
+                    </span>
+                  </div>
+                  <p style={{ color: 'var(--text-muted)' }}>{b.behavior}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Divider */}
       <div className="mx-4 my-3 h-px" style={{ background: 'var(--border)' }} />
 
@@ -130,20 +185,25 @@ export function ScenePipeline({ clip }: ScenePipelineProps) {
           Scene Analysis
         </h3>
         <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-          <TypewriterScene text={clip.sceneDescription} />
+          <TypewriterScene text={sceneText} />
         </p>
       </div>
 
       {/* Divider */}
       <div className="mx-4 my-1 h-px" style={{ background: 'var(--border)' }} />
 
-      {/* Generated prompt */}
+      {/* Seedance prompt - Claude-composed */}
       <div className="px-4 py-3">
-        <h3 className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+        <h3 className="text-[10px] font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--text-dim)' }}>
           Seedance Prompt
+          {analysis?.seedance_prompt && (
+            <span className="text-[8px] px-1 rounded" style={{ background: 'rgba(34,197,94,0.15)', color: '#22C55E' }}>
+              AI-COMPOSED
+            </span>
+          )}
         </h3>
         <div className="rounded p-2 text-xs font-mono leading-relaxed" style={{ background: 'var(--bg)', color: 'var(--accent)' }}>
-          "{clip.description}"
+          "{seedancePrompt}"
         </div>
       </div>
     </aside>

@@ -8,9 +8,10 @@ interface FeedProps {
   generationState: GenerationState;
   onFeedback: (clipId: string, feedback: 'use' | 'skip') => void;
   onClipChange?: (index: number) => void;
+  onVideoRef?: (el: HTMLVideoElement | null) => void;
 }
 
-export function Feed({ clips, generationState, onFeedback, onClipChange }: FeedProps) {
+export function Feed({ clips, generationState, onFeedback, onClipChange, onVideoRef }: FeedProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isScoreAnimating, setIsScoreAnimating] = useState(false);
@@ -105,6 +106,7 @@ export function Feed({ clips, generationState, onFeedback, onClipChange }: FeedP
             generationState={currentClip.isLive ? generationState : undefined}
             onFeedback={handleFeedback}
             isScoreAnimating={isScoreAnimating}
+            onVideoRef={onVideoRef}
           />
         </motion.div>
       </AnimatePresence>

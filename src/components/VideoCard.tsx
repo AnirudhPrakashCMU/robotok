@@ -9,6 +9,7 @@ interface VideoCardProps {
   generationState?: GenerationState;
   onFeedback: (clipId: string, feedback: 'use' | 'skip') => void;
   isScoreAnimating?: boolean;
+  onVideoRef?: (el: HTMLVideoElement | null) => void;
 }
 
 function TypewriterText({ text, speed = 40 }: { text: string; speed?: number }) {
@@ -236,7 +237,7 @@ function DashcamPlaceholder({ clip }: { clip: RankedClip }) {
   );
 }
 
-export function VideoCard({ clip, isActive, generationState, onFeedback, isScoreAnimating }: VideoCardProps) {
+export function VideoCard({ clip, isActive, generationState, onFeedback, isScoreAnimating, onVideoRef }: VideoCardProps) {
   const isLiveGenerating = clip.isLive && generationState?.status === 'generating';
 
   return (
@@ -269,12 +270,14 @@ export function VideoCard({ clip, isActive, generationState, onFeedback, isScore
         ) : clip.videoUrl ? (
           // Real video
           <video
+            ref={(el) => onVideoRef?.(el)}
             className="w-full h-full object-contain"
             src={clip.videoUrl}
             autoPlay={isActive}
             loop
             muted
             playsInline
+            crossOrigin="anonymous"
           />
         ) : (
           // Animated dashcam visualization (no video yet)
