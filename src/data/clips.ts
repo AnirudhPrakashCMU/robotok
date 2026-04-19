@@ -4,12 +4,13 @@ const CLIP_BASE = '/clips';
 
 // Pre-generated clips from Seedance 1.5 Pro via BytePlus API.
 // 11 real AI-generated training scenario videos, 5s each, 720p, 16:9.
+// Clips 12-20 show animated dashcam reconstructions (no Seedance video yet).
 export const DEMO_CLIPS: Clip[] = [
   {
     id: 'clip-001',
     videoUrl: `${CLIP_BASE}/clip-000.mp4`,
     scenario: 'Night Rain Intersection',
-    description: 'Autonomous vehicle navigating a rain-slicked urban intersection at night with pedestrian crossings',
+    description: 'First-person dashcam view from an autonomous truck approaching a rain-slicked urban intersection at night, headlights reflecting off wet asphalt, pedestrian with umbrella crossing ahead',
     category: 'night_driving',
     tags: ['night', 'rain', 'intersection', 'urban', 'pedestrian', 'headlights', 'wet_road'],
     detections: [
